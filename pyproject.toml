@@ -1,0 +1,44 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ugc-deal-engine"
+version = "1.0.0"
+description = "Finds brands that pay for UGC, qualifies them with AI, and runs compliant email follow-up sequences."
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.10"
+dependencies = [
+    "flask>=3.0",
+    "requests>=2.31",
+    "python-dotenv>=1.0",
+    "apscheduler>=3.10,<4",
+    "apify-client>=1.7",
+    "google-genai>=1.0",
+]
+
+[project.optional-dependencies]
+prod = ["gunicorn>=22.0"]
+dev = ["pytest>=8.0", "ruff>=0.5"]
+
+[project.scripts]
+ugc-engine = "ugc_engine.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+ugc_engine = ["web/templates/*.html", "web/static/*.css"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I"]
+ignore = ["E501"]  # long prompt/query strings are intentional

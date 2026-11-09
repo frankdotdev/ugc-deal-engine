@@ -1,0 +1,19 @@
+:root{--bg:#FAF7F2;--ink:#2C2523;--muted:#6E6259;--line:#E6DEC8;--gold:#8A6421;--gold-bg:#F6EEDB;--gold-line:#DFC68D;--dark:#3D2E24}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,sans-serif;font-size:14px;line-height:1.5}
+.wrap{max-width:1100px;margin:0 auto;padding:24px 16px;display:grid;gap:18px}
+header{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;border-bottom:1px solid var(--line);padding-bottom:16px}
+h1{margin:0;font-size:22px}h2{margin:4px 0;font-size:17px}.muted{color:var(--muted);font-size:12px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}.stats b{font-size:22px;display:block}
+.banner{background:var(--gold-bg);border:1px solid var(--gold-line);padding:10px 12px;border-radius:8px}
+.badge{background:var(--gold-bg);color:var(--gold);border:1px solid var(--gold-line);border-radius:6px;padding:2px 8px;font-size:12px}
+.badge.red{background:#fde8e8;color:#9b1c1c;border-color:#f5b5b5}.badge.green{background:#e7f6ec;color:#166534;border-color:#a7dbb7}
+button,.btn{font:inherit;font-size:12px;font-weight:600;border:1px solid var(--gold-line);background:var(--gold-bg);color:var(--gold);border-radius:8px;padding:7px 12px;cursor:pointer;text-decoration:none}
+button.dark{background:var(--dark);color:var(--bg);border-color:var(--dark)}button.gold{background:var(--gold);color:#fff;border-color:var(--gold)}
+.tab{border-radius:999px}.tab.on{background:var(--dark);color:var(--bg)}
+input,textarea,select{font:inherit;font-size:12px;background:var(--bg);border:1px solid var(--gold-line);border-radius:6px;padding:6px 8px;width:100%}
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px}textarea{min-height:170px;font-family:inherit}
+summary{cursor:pointer;color:var(--gold);font-weight:600;font-size:12px}details form{display:grid;gap:8px;margin-top:10px}
+.to{display:flex;gap:8px;align-items:center}.to input{max-width:320px;font-family:ui-monospace,monospace}
+.small-form{display:flex;gap:6px}.small-form select{width:auto}
+a{color:var(--gold)}

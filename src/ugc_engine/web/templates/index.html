@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>UGC Deal Engine</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"></head>
+<body><div class="wrap">
+{% if msg %}<div class="banner">{{ msg }}</div>{% endif %}
+<header>
+  <div><h1>UGC Deal Engine</h1><div class="muted">{{ last_scan }}</div></div>
+  <div class="row">
+    <form action="{{ url_for('views.scan', f=f) }}" method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="dark">Scan for new deals</button></form>
+    <form action="{{ url_for('views.queue', f=f) }}" method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="gold">Check inbox + send due follow-ups</button></form>
+    <a class="btn" href="{{ url_for('views.export_csv') }}">Export CSV</a>
+  </div>
+</header>
+<section class="stats">
+  <div class="card"><span class="muted">Leads</span><b>{{ total }}</b></div>
+  <div class="card"><span class="muted">Ready to pitch</span><b>{{ ready }}</b></div>
+  <div class="card"><span class="muted">In sequence</span><b>{{ active }}</b></div>
+  <div class="card"><span class="muted">Replies</span><b>{{ replies }}</b></div>
+  <div class="card"><span class="muted">Sent today</span><b>{{ today }}/{{ limit }}</b><span class="muted">{{ mode }}</span></div>
+</section>
+<nav class="row">{% for key, label in tabs %}<a class="btn tab {{ 'on' if f == key }}" href="{{ url_for('views.index', f=key) }}">{{ label }}</a>{% endfor %}</nav>
+
+{% for l in leads %}
+<article class="card">
+  <div class="row" style="justify-content:space-between;align-items:flex-start">
+    <div>
+      <div class="row">
+        <span class="badge">{{ l.platform }}</span><span class="badge green">Intent {{ l.intent_score }}</span>
+        <span class="badge">Competition: {{ l.competition_level }}</span><span class="badge">{{ l.status }} ({{ l.sequence_step }}/3)</span>
+        {% if l.is_demo %}<span class="badge red">DEMO</span>{% endif %}
+        {% if l.next_followup_at %}<span class="muted">next: {{ l.next_followup_at }} UTC</span>{% endif %}
+      </div>
+      <h2>{{ l.brand_name }}
+        {% if l.brand_domain %}<a class="muted" target="_blank" rel="noopener noreferrer" href="https://{{ l.brand_domain }}">{{ l.brand_domain }}</a>{% endif %}
+        {% if l.source_url.startswith('http') %}<a class="muted" target="_blank" rel="noopener noreferrer" href="{{ l.source_url }}">source</a>{% endif %}
+      </h2>
+      <div class="muted">"{{ l.raw_snippet[:220] }}"</div>
+    </div>
+    <form class="small-form" action="{{ url_for('views.status', lead_id=l.id, f=f) }}" method="post">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <select name="status">{% for st in statuses %}<option {{ 'selected' if l.status == st }}>{{ st }}</option>{% endfor %}</select>
+      <button>Set</button>
+    </form>
+  </div>
+  <details><summary>Review / edit emails &amp; send</summary>
+    <form method="post">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="to"><label class="muted">To</label><input name="contact_email" value="{{ l.contact_email }}" placeholder="needs an email"><span class="muted">{{ l.decision_maker }}</span></div>
+      <input name="email_subject" value="{{ l.email_subject }}" placeholder="subject">
+      <div class="steps">
+        <div><div class="muted">STEP 1 (day 0)</div><textarea name="step1_body">{{ l.step1_body }}</textarea></div>
+        <div><div class="muted">STEP 2 (+3 days)</div><textarea name="step2_body">{{ l.step2_body }}</textarea></div>
+        <div><div class="muted">STEP 3 (+7 days)</div><textarea name="step3_body">{{ l.step3_body }}</textarea></div>
+      </div>
+      <div class="row">
+        <button formaction="{{ url_for('views.save', lead_id=l.id, f=f) }}">Save edits</button>
+        {% if not (l.replied or l.bounced or l.unsubscribed) and l.sequence_step < 3 %}
+        <button class="gold" formaction="{{ url_for('views.send', lead_id=l.id, f=f) }}">Save &amp; send step {{ l.sequence_step + 1 }}</button>
+        {% endif %}
+      </div>
+    </form>
+  </details>
+</article>
+{% else %}<p class="muted">No leads in this view yet. Click "Scan for new deals" (the worker must be running).</p>{% endfor %}
+</div></body></html>

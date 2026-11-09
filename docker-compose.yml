@@ -1,0 +1,27 @@
+services:
+  web:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DB_PATH: /data/ugc_engine.db
+      HOST: 0.0.0.0
+    ports:
+      - "127.0.0.1:8000:8000"   # put a TLS reverse proxy (Caddy/nginx) in front for remote access
+    volumes:
+      - ugc_data:/data
+
+  worker:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DB_PATH: /data/ugc_engine.db
+    command: ["ugc-engine", "worker"]
+    healthcheck:
+      disable: true
+    volumes:
+      - ugc_data:/data
+
+volumes:
+  ugc_data:
