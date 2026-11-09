@@ -3,7 +3,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![Code Style: Ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
-[![CI Status](https://img.shields.io/badge/CI-passing-brightgreen.svg)](https://github.com/your-username/ugc-deal-engine/actions)
+[![CI Status](https://img.shields.io/badge/CI-passing-brightgreen.svg)](https://github.com/frankdotdev/ugc-deal-engine/actions)
 
 An open-source, autonomous deal engine for **User Generated Content (UGC) creators, creative strategists, and performance ad agencies**.
 
@@ -26,6 +26,7 @@ An open-source, autonomous deal engine for **User Generated Content (UGC) creato
 - [CLI Reference](#-cli-reference)
 - [Safety & Compliance Rules](#-safety--compliance-rules)
 - [Contributing](#-contributing)
+- [Author & Credits](#-author--credits)
 - [License & Disclaimer](#-license--disclaimer)
 
 ---
@@ -143,7 +144,7 @@ ugc-deal-engine/
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/your-username/ugc-deal-engine.git
+   git clone https://github.com/frankdotdev/ugc-deal-engine.git
    cd ugc-deal-engine
    ```
 
@@ -174,18 +175,17 @@ ugc-deal-engine/
    ugc-engine seed-demo
    ```
 
-6. **Start the applications:**
-   - **Terminal 1 (Web Dashboard):**
-     ```bash
-     make web
-     # Or: ugc-engine web
-     ```
-     Open `http://127.0.0.1:5000` in your browser. (Login username: `admin`, password: see terminal output or your `DASHBOARD_PASSWORD`).
-   - **Terminal 2 (Worker Scheduler):**
-     ```bash
-     make worker
-     # Or: ugc-engine worker
-     ```
+6. **Start everything with one command:**
+   ```bash
+   make start
+   # Or: ugc-engine start (alias: ugc-engine run)
+   ```
+   Both the **Web Dashboard** and the **Worker Scheduler** run concurrently in your single terminal!
+   Open `http://127.0.0.1:5000` in your browser. (Login username: `admin`, password: see terminal output or your `DASHBOARD_PASSWORD`).
+
+   *(Optional)* If you prefer running them in separate processes:
+   - Terminal 1: `ugc-engine web`
+   - Terminal 2: `ugc-engine worker`
 
 ### Docker & Production Deployment
 
@@ -257,6 +257,18 @@ The web dashboard is exposed at `http://127.0.0.1:8000`. Place a reverse proxy s
 | `SEND_WINDOW_UTC` | `08-18` | No | Permitted UTC sending hours (Mon-Fri only). |
 | `SEND_JITTER_SECONDS` | `20-75` | No | Randomized delay in seconds between consecutive emails to protect reputation. |
 | `QUEUE_MINUTES` | `30` | No | Interval (in minutes) for worker inbox checks and due follow-up processing. |
+
+---
+
+### 🧩 Modular & Independent Architecture
+
+Every external API integration in UGC Deal Engine is completely decoupled and optional. The engine will run smoothly and gracefully adapt regardless of which keys you configure:
+
+- **No `SERPER_API_KEY`:** Google X-Ray searches are skipped; ad library and demo leads continue to work.
+- **No `APIFY_API_TOKEN`:** TikTok/Meta Ad Library scrapers are skipped; Serper X-Ray leads continue to work.
+- **No `GEMINI_API_KEY` (or if Gemini quota is exceeded):** Automatically falls back to the built-in rule-based qualifier and sequence generator.
+- **No `HUNTER_API_KEY`:** Decision-maker lookup falls back to direct post-snippet parsing and brand website crawling.
+- **No `SMTP_EMAIL` / `SMTP_APP_PASSWORD`:** Outreach runs in safe simulation mode (`[SIMULATED]`), allowing you to test sequences and dashboard interactions without sending real messages.
 
 ---
 
@@ -335,13 +347,16 @@ The web dashboard is exposed at `http://127.0.0.1:8000`. Place a reverse proxy s
 The `ugc-engine` CLI allows direct control over the engine:
 
 ```bash
+# Run everything at once (Web Dashboard + Worker Daemon together)
+ugc-engine start    # or: ugc-engine run
+
 # Validate your .env settings against production rules
 ugc-engine check-config
 
-# Run the web dashboard development server
+# Run the web dashboard development server separately
 ugc-engine web
 
-# Run the background worker daemon (scans, inbox checks, follow-ups)
+# Run the background worker daemon separately (scans, inbox checks, follow-ups)
 ugc-engine worker
 
 # Execute an immediate discovery scan right now
@@ -430,9 +445,21 @@ Contributions are welcome! Please follow these guidelines:
 
 ---
 
+## 👤 Author & Credits
+
+Built with ❤️ by **[Frank Oge](https://frankoge.com)** of **[Hackverse Technologies](https://hackversetechnologies.vercel.app)**.
+
+---
+
 ## ⚖️ License & Disclaimer
 
 This project is licensed under the **[MIT License](LICENSE)**.
 
 ### Legal Disclaimer
 *UGC Deal Engine provides the mechanical tooling for lead discovery and compliant email sending (suppression lists, opt-out headers, and address requirements). However, email marketing regulations (including the US CAN-SPAM Act, Canadian CASL, UK PECR, and EU GDPR) differ by region and context. You are solely responsible for ensuring your outreach practices comply with all local and international laws applicable to you and your recipients. This project is provided as-is without any warranties or guarantees of deal closure.*
+
+---
+
+<div align="center">
+  <sub>Built by <a href="https://frankoge.com">Frank Oge</a> of <a href="https://hackversetechnologies.vercel.app">Hackverse Technologies</a></sub>
+</div>

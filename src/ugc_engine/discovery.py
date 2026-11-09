@@ -48,7 +48,10 @@ def run_discovery(s: Settings | None = None) -> dict:
             }
             if repo.save_lead(lead):
                 added += 1
-        text = f"Last scan {clock.ts()} UTC: {len(items)} signals, {added} new qualified leads."
+        note = ""
+        if not (s.serper_api_key or s.apify_api_token):
+            note = " (SERPER_API_KEY and APIFY_API_TOKEN not configured)"
+        text = f"Last scan {clock.ts()} UTC: {len(items)} signals, {added} new qualified leads.{note}"
         repo.set_kv("last_scan", text)
         log.info(text)
         return {"scanned": len(items), "added": added}

@@ -15,3 +15,16 @@ def test_rule_based_accepts_buyer_post(settings):
 
 def test_rule_based_rejects_irrelevant(settings):
     assert ai.qualify({"title": "Cat photos", "snippet": "look at my cat", "platform": "X (Twitter)", "niche": "x"}, settings) is None
+
+
+def test_gemini_exception_falls_back_to_rule_based(settings, monkeypatch):
+    class BadClient:
+        class models:
+            @staticmethod
+            def generate_content(*a, **kw):
+                raise RuntimeError("API quota exceeded")
+    monkeypatch.setattr(ai, "_gemini", lambda s: (BadClient(), None))
+    item = {"title": "Founder", "snippet": "We are hiring UGC creators, paid $200/video. hi@brand.com",
+            "platform": "X (Twitter)", "niche": "skincare"}
+    out = ai.qualify(item, settings)
+    assert out and out["intent_score"] >= 80

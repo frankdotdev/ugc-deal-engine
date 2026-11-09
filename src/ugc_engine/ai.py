@@ -109,8 +109,8 @@ Return JSON only:
         text = re.sub(r"^```(?:json)?|```$", "", resp.text.strip(), flags=re.M).strip()
         out = json.loads(text)
     except Exception as exc:
-        log.warning("Gemini qualification failed: %s", exc)
-        return None
+        log.warning("Gemini qualification failed: %s; falling back to rule-based qualification", exc)
+        return _rule_based(item, s, snippet, low)
     if not out.get("is_valid_buyer"):
         return None
     fb = fallback_sequence(out.get("brand_name") or item.get("brand_name") or "your brand", platform, niche, s)

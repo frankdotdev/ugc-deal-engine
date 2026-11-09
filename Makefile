@@ -1,4 +1,4 @@
-.PHONY: install test lint web worker check up down logs backup
+.PHONY: install test lint start run web worker check up down logs backup
 
 install:
 	python -m venv .venv && .venv/bin/pip install -e ".[dev,prod]"
@@ -11,6 +11,12 @@ lint:
 
 check:
 	.venv/bin/ugc-engine check-config
+
+start:
+	.venv/bin/ugc-engine start
+
+run:
+	.venv/bin/ugc-engine start
 
 web:
 	.venv/bin/ugc-engine web

@@ -36,6 +36,25 @@ def _cmd_web(_args) -> int:
     return 0
 
 
+def _cmd_start(_args) -> int:
+    from .scheduler import start_background_scheduler
+    from .web import create_app
+    s = get_settings()
+    init_db()
+    for w in s.warnings():
+        print(f"[warn] {w}")
+    sched = start_background_scheduler(s)
+    app = create_app(s)
+    if s.password_generated:
+        print(f"Dashboard login -> user: admin  password: {s.dashboard_password}")
+    print(f"UGC Deal Engine running at http://{s.host}:{s.port} (worker active in background)")
+    try:
+        app.run(host=s.host, port=s.port, debug=False, threaded=True)
+    finally:
+        sched.shutdown(wait=False)
+    return 0
+
+
 def _cmd_worker(_args) -> int:
     from .scheduler import run_worker
     run_worker()
@@ -81,6 +100,8 @@ def main(argv=None) -> int:
     parser.add_argument("--version", action="version", version=__version__)
     sub = parser.add_subparsers(dest="command", required=True)
     for name, fn, helptext in (
+        ("start", _cmd_start, "run web dashboard and background worker together in one command"),
+        ("run", _cmd_start, "alias for start (runs web + worker together)"),
         ("check-config", _cmd_check, "validate configuration"),
         ("web", _cmd_web, "run the dashboard (dev server; use gunicorn in production)"),
         ("worker", _cmd_worker, "run the scheduler worker (discovery, inbox, follow-ups)"),

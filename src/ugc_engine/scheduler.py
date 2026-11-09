@@ -36,6 +36,20 @@ def build_scheduler(s: Settings) -> BlockingScheduler:
     return sched
 
 
+def start_background_scheduler(s: Settings | None = None):
+    """Start an APScheduler BackgroundScheduler running discovery, queue, and dashboard jobs in background threads."""
+    from apscheduler.schedulers.background import BackgroundScheduler
+    s = s or get_settings()
+    init_db()
+    sched = BackgroundScheduler(timezone="UTC", job_defaults={"coalesce": True, "max_instances": 1, "misfire_grace_time": 300})
+    sched.add_job(run_discovery, "interval", hours=s.discovery_hours, args=[s], id="discovery",
+                  next_run_time=clock.now() + timedelta(seconds=15))
+    sched.add_job(process_queue, "interval", minutes=s.queue_minutes, args=[s], id="queue")
+    sched.add_job(process_job_requests, "interval", seconds=15, id="job_requests")
+    sched.start()
+    return sched
+
+
 def run_worker() -> None:
     s = get_settings()
     problems = s.problems("worker")

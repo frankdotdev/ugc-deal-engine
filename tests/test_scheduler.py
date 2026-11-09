@@ -17,3 +17,13 @@ def test_scheduler_registers_jobs(settings):
     sched = scheduler.build_scheduler(settings)
     ids = {job.id for job, *_ in sched._pending_jobs}
     assert ids == {"discovery", "queue", "job_requests"}
+
+
+def test_start_background_scheduler(settings):
+    sched = scheduler.start_background_scheduler(settings)
+    try:
+        assert sched.running
+        job_ids = {job.id for job in sched.get_jobs()}
+        assert {"discovery", "queue", "job_requests"}.issubset(job_ids)
+    finally:
+        sched.shutdown(wait=False)

@@ -8,6 +8,9 @@ version = "1.0.0"
 description = "Finds brands that pay for UGC, qualifies them with AI, and runs compliant email follow-up sequences."
 readme = "README.md"
 license = {text = "MIT"}
+authors = [
+    {name = "Frank Oge", email = "ogekcfrankie@gmail.com"},
+]
 requires-python = ">=3.10"
 dependencies = [
     "flask>=3.0",
